@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Input</title>
+    <style>
+        /* Reset some default styles */
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5; /* Light background */
+    color: #333; /* Dark text for better readability */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px; /* Max width for the chat container */
+    background-color: #fff; /* White background for chat area */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    overflow: hidden; /* Hide overflow */
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background-color: #007bff; /* Blue header */
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.5em;
+    border-bottom: 2px solid #0056b3; /* Darker blue for border */
+}
+
+.messages {
+    padding: 20px;
+    flex-grow: 1; /* Allow this section to grow */
+    overflow-y: auto; /* Scrollable area for messages */
+    max-height: 400px; /* Limit height */
+}
+
+.user-message, .bot-message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 70%;
+}
+
+.user-message {
+    background-color: #007bff; /* User messages in blue */
+    color: white;
+    align-self: flex-end; /* Align to the right */
+    margin-left: auto; /* Push to the right */
+}
+
+.bot-message {
+    background-color: #e9ecef; /* Bot messages in light grey */
+    color: #333;
+    align-self: flex-start; /* Align to the left */
+}
+
+.input-area {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0; /* Light grey border for input */
+    display: flex;
+}
+
+input[type="text"] {
+    flex-grow: 1; /* Take remaining space */
+    padding: 10px;
+    border: 1px solid #ced4da; /* Light grey border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1em;
+}
+
+input[type="submit"] {
+    background-color: #007bff; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+    </style>
+</head>
+<body>
+    <h1>Enter Your Symptoms</h1>
+    <form action="/submit_symptoms" method="POST">
+        <label for="symptoms">Symptoms:</label>
+        <input type="text" id="symptoms" name="symptoms" required>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        function submitSymptoms() {
+    const symptoms = document.getElementById('symptom-input').value; // Replace with actual input element
+    const prompt = "Your prompt here"; // Replace with actual prompt
+
+    fetch('/submit_symptoms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, prompt })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+        } else if (data.error) {
+            alert(data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+        document.querySelector("form").onsubmit = async function(event) {
+            event.preventDefault();
+            const symptoms = document.querySelector("#symptoms").value;
+            const response = await fetch("/submit_symptoms", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: new URLSearchParams({symptoms})
+            });
+            const data = await response.json();
+            document.querySelector("#result").innerHTML = data.recommended_treatment || data.error;
+        };
+    </script>
+</body>
+</html>
